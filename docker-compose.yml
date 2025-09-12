@@ -1,0 +1,28 @@
+services:
+  hospital_mysql:
+    image: mysql:8.0
+    container_name: hospital_mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: #el nombre de tu base de datos
+      MYSQL_USER: #usuario
+      MYSQL_PASSWORD: #contraseña
+      MYSQL_ROOT_PASSWORD: #contraseña de root
+    ports:
+      - '3310:3306'
+    volumes:
+      - db_citas:/var/lib/mysql
+  hospital:
+    container_name: app_hospital
+    build: .
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://hospital_mysql:3306/ #el nombre de tu base de datos
+      SPRING_DATASOURCE_USERNAME: #usuario
+      SPRING_DATASOURCE_PASSWORD: #contraseña
+    ports:
+      - '8085:8080'
+    depends_on:
+      - hospital_mysql
+
+volumes:
+  db_citas:
