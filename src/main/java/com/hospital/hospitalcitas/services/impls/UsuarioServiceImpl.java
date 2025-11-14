@@ -1,4 +1,4 @@
-package com.hospital.hospitalcitas.services;
+package com.hospital.hospitalcitas.services.impls;
 
 import com.hospital.hospitalcitas.dtos.request.UsuarioRequest;
 import com.hospital.hospitalcitas.dtos.response.UsuarioResponse;
@@ -8,6 +8,7 @@ import com.hospital.hospitalcitas.models.Role;
 import com.hospital.hospitalcitas.models.Usuario;
 import com.hospital.hospitalcitas.repositories.IRoleRepository;
 import com.hospital.hospitalcitas.repositories.IUsuarioRepository;
+import com.hospital.hospitalcitas.services.interfaces.IUsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -55,9 +56,11 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
     @Override
     public void update(int id, UsuarioRequest usuarioInp) {
-        Optional<Usuario> usuario = usuarioRepository.findById(id);
-        Usuario usuarioDb = usuario.orElseThrow(()-> new HandlerExistException("El usuario no existe"));
-        usuarioDb.setPassword(usuarioInp.getPassword());
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
+        Usuario usuarioDb = usuarioOpt.orElseThrow(() -> new HandlerExistException("El usuario no existe"));
+        String nuevaContrasena = usuarioInp.getPassword();
+        String contrasenaEncriptada = passwordEncoder.encode(nuevaContrasena);
+        usuarioDb.setPassword(contrasenaEncriptada);
         usuarioRepository.save(usuarioDb);
     }
 
@@ -69,6 +72,16 @@ public class UsuarioServiceImpl implements IUsuarioService {
              throw new HandlerExistException("El usuario se encuentra inactivo");
         }
         usuarioDb.setEstado(Estado.INACTIVO);
+        usuarioRepository.save(usuarioDb);
+    }
+    @Override
+    public void activarUser(int id) {
+        Optional<Usuario> usuario = usuarioRepository.findById(id);
+        Usuario usuarioDb = usuario.orElseThrow(()-> new HandlerExistException("El usuario no existe"));
+        if(usuarioDb.getEstado() == Estado.ACTIVO){
+            throw new HandlerExistException("El usuario se encuentra activo");
+        }
+        usuarioDb.setEstado(Estado.ACTIVO);
         usuarioRepository.save(usuarioDb);
     }
 }

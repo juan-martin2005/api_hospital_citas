@@ -22,7 +22,12 @@ public class UsuarioRequest {
     private String nombre;
     @NotBlank(message = "el campo apellido no debe estar vacío")
     private String apellido;
-    @NotNull(message = "el campo rol no debe estar vacío")
-    private List<Role> roles;
-
+    @NotBlank(message = "el campo email no debe estar vacío")
+    private String email;
+    @NotBlank(message = "el campo telefono no debe estar vacío")
+    private String telefono;
+    @NotBlank(message = "el campo telefono no debe estar vacío")
+    private String sexo;
+    private String especialidad;
+    private String estado;
 }

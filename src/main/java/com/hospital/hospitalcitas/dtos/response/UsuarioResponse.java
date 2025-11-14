@@ -17,6 +17,7 @@ public class UsuarioResponse {
     private String apellido;
     private String username;
     private Set<Role> roles;
+    private String estado;
 
     public UsuarioResponse(Usuario usuario) {
         this.id = usuario.getId();
@@ -24,5 +25,6 @@ public class UsuarioResponse {
         this.apellido = usuario.getApellido();
         this.username = usuario.getUsername();
         this.roles = usuario.getRol();
+        this.estado = usuario.getEstado().toString();
     }
 }

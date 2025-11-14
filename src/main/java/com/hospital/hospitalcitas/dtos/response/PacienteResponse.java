@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.Period;
 
 @Getter
 @Setter
@@ -19,7 +20,9 @@ public class PacienteResponse {
     private String nombre;
     private String apellido;
     private String telefono;
+    private char sexo;
     private LocalDate fechaNacimiento;
+    private Integer edad;
 
     public PacienteResponse(Paciente paciente) {
         this.id = paciente.getId();
@@ -28,6 +31,8 @@ public class PacienteResponse {
         this.nombre = paciente.getUsuario().getNombre();
         this.apellido = paciente.getUsuario().getApellido();
         this.telefono = paciente.getTelefono();
+        this.sexo = paciente.getSexo();
         this.fechaNacimiento = paciente.getFechaNacimiento();
+        this.edad = Period.between(paciente.getFechaNacimiento(), LocalDate.now()).getYears();
     }
 }

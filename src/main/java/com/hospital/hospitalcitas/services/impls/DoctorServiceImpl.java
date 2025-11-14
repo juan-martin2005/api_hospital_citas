@@ -1,14 +1,18 @@
-package com.hospital.hospitalcitas.services;
+package com.hospital.hospitalcitas.services.impls;
 
+import com.hospital.hospitalcitas.dtos.request.CambiarPasswordRequest;
 import com.hospital.hospitalcitas.dtos.request.DoctorRequest;
 import com.hospital.hospitalcitas.dtos.response.DoctorResponse;
+import com.hospital.hospitalcitas.erros.HandlerPasswordChangeException;
 import com.hospital.hospitalcitas.erros.HandlerExistException;
 import com.hospital.hospitalcitas.models.*;
 import com.hospital.hospitalcitas.repositories.IDoctorRepository;
 import com.hospital.hospitalcitas.repositories.IEspecialidadRepository;
 import com.hospital.hospitalcitas.repositories.IRoleRepository;
 import com.hospital.hospitalcitas.repositories.IUsuarioRepository;
+import com.hospital.hospitalcitas.services.interfaces.IDoctorService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +20,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class DoctorServiceImpl implements IDoctorService{
+public class DoctorServiceImpl implements IDoctorService {
     private final IDoctorRepository doctorRepository;
     private final IRoleRepository roleRepository;
     private final IUsuarioRepository usuarioRepository;
@@ -38,6 +42,11 @@ public class DoctorServiceImpl implements IDoctorService{
     }
 
     @Override
+    public DoctorResponse perfilDoctor() {
+        return new DoctorResponse(doctorActual());
+    }
+
+    @Override
     public void save(DoctorRequest doctor) {
         Optional<Role> optRole = roleRepository.findByNombre("ROLE_DOCTOR");
         Set<Role> role = new HashSet<>();
@@ -45,7 +54,7 @@ public class DoctorServiceImpl implements IDoctorService{
         Especialidad especialidad = especialidadRepository.findByNombre(doctor.getEspecialidad()).
                 orElseThrow(() -> new HandlerExistException("La especialidad no existe"));
         if(usuarioRepository.existsByUsername(doctor.getEmail())){
-            throw new HandlerExistException("El nombre de usuario ya existe");
+            throw new HandlerExistException("El doctor ya existe");
         }
         String password = passwordEncoder.encode(doctor.getPassword());
         Usuario uDoctor = Usuario.builder()
@@ -67,10 +76,22 @@ public class DoctorServiceImpl implements IDoctorService{
     }
 
     @Override
-    public void update(int id, DoctorRequest doctor) {
-        Optional<Doctor> oDoctor = doctorRepository.findById(id);
+    public void updatePassword(CambiarPasswordRequest doctor) {
+        Optional<Doctor> oDoctor = doctorRepository.findById(doctorActual().getId());
         Doctor doctorDb = oDoctor.orElseThrow(()-> new HandlerExistException("El doctor no existe"));
-        doctorDb.getUsuario().setPassword(doctor.getPassword());
+        boolean isSamePassword = passwordEncoder.matches(doctor.getPassword(),doctorDb.getUsuario().getPassword());
+        if(isSamePassword) {
+            throw new HandlerPasswordChangeException("La contraseña no puede ser la misma que ya tienes");
+        }
+        String password = passwordEncoder.encode(doctor.getPassword());
+        doctorDb.getUsuario().setPassword(password);
         doctorRepository.save(doctorDb);
+    }
+
+    public Doctor doctorActual() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Doctor doctor = doctorRepository.findByUsuario_Username(username).orElseThrow();
+        System.out.println(username);
+        return doctor;
     }
 }

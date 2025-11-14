@@ -1,6 +1,7 @@
-package com.hospital.hospitalcitas.services;
+package com.hospital.hospitalcitas.services.impls;
 
 import com.hospital.hospitalcitas.dtos.request.CitaMedicaRequest;
+import com.hospital.hospitalcitas.dtos.response.CitaDoctorResponse;
 import com.hospital.hospitalcitas.dtos.response.CitaMedicaResponse;
 import com.hospital.hospitalcitas.erros.HandlerCitaException;
 import com.hospital.hospitalcitas.erros.HandlerExistException;
@@ -9,11 +10,11 @@ import com.hospital.hospitalcitas.repositories.ICitamedicaRepository;
 import com.hospital.hospitalcitas.repositories.IDoctorRepository;
 import com.hospital.hospitalcitas.repositories.IHorarioDoctorRepository;
 import com.hospital.hospitalcitas.repositories.IPacienteRepository;
+import com.hospital.hospitalcitas.services.interfaces.ICitaMedicaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.print.Doc;
 import java.util.List;
 
 @Service
@@ -24,6 +25,12 @@ public class CitaMedicaServiceImpl implements ICitaMedicaService {
     private final IDoctorRepository doctorRepository;
     private final ICitamedicaRepository citamedicaRepository;
     private final IHorarioDoctorRepository horarioDoctorRepository;
+
+    @Override
+    public List<CitaDoctorResponse> findAllCitasPaciente() {
+        Doctor doctor = doctorActual();
+        return citamedicaRepository.findByDoctor_id(doctor.getId()).stream().map(CitaDoctorResponse::new).toList();
+    }
 
     @Override
     public List<CitaMedicaResponse> findAllMyCitas() {
@@ -60,6 +67,22 @@ public class CitaMedicaServiceImpl implements ICitaMedicaService {
         citamedicaRepository.save(citaMedicaDb);
     }
 
+    @Override
+    public void cancelarCitaMedica(Integer id) {
+        Paciente paciente = pacienteActual();
+        CitaMedica cita = citamedicaRepository.findByPaciente_IdAndId(id, paciente.getId()).orElseThrow(() -> new HandlerExistException("La cita no se ha encontrado"));
+        cita.setEstado(Estado.CANCELADO);
+        citamedicaRepository.save(cita);
+    }
+
+    @Override
+    public void finalizarCitaMedica(Integer id) {
+        Doctor doctor = doctorActual();
+        CitaMedica cita = citamedicaRepository.findByDoctor_IdAndId(doctor.getId(),id).orElseThrow(() -> new HandlerExistException("La cita no se ha encontrado"));
+        cita.setEstado(Estado.FINALIZADO);
+        citamedicaRepository.save(cita);
+
+    }
 
     public Paciente pacienteActual() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -67,4 +90,11 @@ public class CitaMedicaServiceImpl implements ICitaMedicaService {
         System.out.println(username);
         return paciente;
     }
+    public Doctor doctorActual() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Doctor doctor = doctorRepository.findByUsuario_Username(username).orElseThrow();
+        System.out.println(username);
+        return doctor;
+    }
+
 }

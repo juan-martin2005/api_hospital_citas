@@ -1,8 +1,7 @@
 package com.hospital.hospitalcitas.controllers;
 
 import com.hospital.hospitalcitas.dtos.request.CitaMedicaRequest;
-import com.hospital.hospitalcitas.models.CitaMedica;
-import com.hospital.hospitalcitas.services.ICitaMedicaService;
+import com.hospital.hospitalcitas.services.interfaces.ICitaMedicaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,7 +15,11 @@ public class CitaMedicaController {
 
     private final ICitaMedicaService citaMedicaService;
 
-    @GetMapping
+    @GetMapping("/pacientes")
+    public ResponseEntity<?> listarCitasPaciente() {
+        return ResponseEntity.ok(citaMedicaService.findAllCitasPaciente());
+    }
+    @GetMapping("/mis-citas")
     public ResponseEntity<?> listarMisCitas(){
         return ResponseEntity.ok(citaMedicaService.findAllMyCitas());
     }
@@ -27,4 +30,14 @@ public class CitaMedicaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseApi("Cita médica reservada",201));
     }
 
+    @PatchMapping("cancelar/{id}")
+    public ResponseEntity<?> cancelarCita(@PathVariable Integer id){
+        citaMedicaService.cancelarCitaMedica(id);
+        return ResponseEntity.ok(new ResponseApi("La cita médica ha sido cancelada",200));
+    }
+    @PatchMapping("finalizar/{id}")
+    public ResponseEntity<?> finalizarCita(@PathVariable Integer id){
+        citaMedicaService.finalizarCitaMedica(id);
+        return ResponseEntity.ok(new ResponseApi("Se ha finalizado la cita médica",200));
+    }
 }

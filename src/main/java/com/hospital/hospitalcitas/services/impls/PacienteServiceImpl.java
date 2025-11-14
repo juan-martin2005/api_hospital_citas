@@ -1,15 +1,18 @@
-package com.hospital.hospitalcitas.services;
+package com.hospital.hospitalcitas.services.impls;
 
-import ch.qos.logback.classic.encoder.JsonEncoder;
+import com.hospital.hospitalcitas.dtos.request.ActualizarPerfilRequest;
+import com.hospital.hospitalcitas.dtos.request.CambiarPasswordRequest;
 import com.hospital.hospitalcitas.dtos.request.PacienteRequest;
 import com.hospital.hospitalcitas.dtos.response.PacienteResponse;
+import com.hospital.hospitalcitas.erros.HandlerPasswordChangeException;
 import com.hospital.hospitalcitas.erros.HandlerExistException;
 import com.hospital.hospitalcitas.models.*;
-import com.hospital.hospitalcitas.repositories.IEspecialidadRepository;
 import com.hospital.hospitalcitas.repositories.IPacienteRepository;
 import com.hospital.hospitalcitas.repositories.IRoleRepository;
 import com.hospital.hospitalcitas.repositories.IUsuarioRepository;
+import com.hospital.hospitalcitas.services.interfaces.IPacienteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +23,7 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-public class PacienteServiceImpl implements IPacienteService{
+public class PacienteServiceImpl implements IPacienteService {
 
     private final IPacienteRepository pacienteRepository;
     private final IRoleRepository roleRepository;
@@ -37,6 +40,11 @@ public class PacienteServiceImpl implements IPacienteService{
     public PacienteResponse findById(int id) {
         Optional<Paciente> paciente = pacienteRepository.findById(id);
         return paciente.map(PacienteResponse::new).orElseThrow(() ->new HandlerExistException("El paciendo no se ha encontrado"));
+    }
+
+    @Override
+    public PacienteResponse perfilPaciente() {
+        return new PacienteResponse(pacienteActual());
     }
 
     @Override
@@ -72,11 +80,32 @@ public class PacienteServiceImpl implements IPacienteService{
 
     //**El paciente puede actualizar su contraseña o telefono***//
     @Override
-    public void update(int id, PacienteRequest paciente) {
-        Paciente pacienteDb = pacienteRepository.findById(id).orElseThrow(()-> new HandlerExistException("El paciente no se ha encontrado"));
+    public void update(ActualizarPerfilRequest paciente) {
+        Paciente pacienteDb = pacienteRepository.findById(pacienteActual().getId())
+                .orElseThrow(()-> new HandlerExistException("El paciente no se ha encontrado"));
         pacienteDb.setTelefono(paciente.getTelefono());
-        pacienteDb.getUsuario().setPassword(paciente.getPassword());
+        pacienteDb.setEmail(paciente.getEmail());
         pacienteRepository.save(pacienteDb);
 
+    }
+    @Override
+    public void updatePassword(CambiarPasswordRequest paciente) {
+        Paciente pacienteDb = pacienteRepository.findById(pacienteActual().getId())
+                .orElseThrow(()-> new HandlerExistException("El paciente no se ha encontrado"));
+        boolean isSamePassword = passwordEncoder.matches(paciente.getPassword(), pacienteDb.getUsuario().getPassword());
+        if(isSamePassword){
+            throw new HandlerPasswordChangeException("La contraseña no puede ser la misma que ya tienes");
+        }
+        String password = passwordEncoder.encode(paciente.getPassword());
+        pacienteDb.getUsuario().setPassword(password);
+        pacienteRepository.save(pacienteDb);
+
+    }
+
+    public Paciente pacienteActual() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Paciente paciente = pacienteRepository.findByUsuario_Username(username).orElseThrow();
+        System.out.println(username);
+        return paciente;
     }
 }

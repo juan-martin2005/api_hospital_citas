@@ -43,11 +43,10 @@ public class HandlerErrorExceptionController {
     public ResponseEntity<?> handleValidationErrors(MethodArgumentNotValidException ex) {
         ErrorMessage error = new ErrorMessage();
         Map<String, Object> campoVacio = new HashMap<>();
-
+        error.setError("Campos invalidos");
         ex.getBindingResult().getFieldErrors().forEach(
                 e -> campoVacio.put(e.getField(),e.getDefaultMessage())
         );
-        error.setError("Campos vacios");
         error.setStatus(HttpStatus.BAD_REQUEST.value());
         error.setMessage(campoVacio);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
@@ -71,9 +70,7 @@ public class HandlerErrorExceptionController {
     @ExceptionHandler({DataIntegrityViolationException.class})
     public ResponseEntity<?> handleValidationErrors(DataIntegrityViolationException ex) {
         ErrorMessage error = new ErrorMessage();
-        error.setError("No puede haber entradas duplicadas");
         error.setStatus(HttpStatus.BAD_REQUEST.value());
-        error.setMessage("Error interno con la base de datos");
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
     @ExceptionHandler({BadCredentialsException.class})
@@ -93,5 +90,22 @@ public class HandlerErrorExceptionController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
+    @ExceptionHandler(HandlerMercadoPagoException.class)
+    public ResponseEntity<Object> handleMercadoPagoException(HandlerMercadoPagoException exception) {
+        ErrorMessage error = new ErrorMessage();
 
+        error.setError(exception.getMessage());
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HandlerPasswordChangeException.class)
+    public ResponseEntity<Object> handlerPasswordChange(HandlerPasswordChangeException exception) {
+        ErrorMessage error = new ErrorMessage();
+        error.setError("Contraseña invalida");
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        error.setMessage(exception.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
 }

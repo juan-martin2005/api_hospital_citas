@@ -32,10 +32,12 @@ public class Usuario {
     private Set<Role> rol;
     @Enumerated(EnumType.STRING)
     private Estado estado;
-
+    private LocalDate fechaRegistro;
     @PrePersist
     public void prePersist() {
         this.estado = Estado.ACTIVO;
+        this.fechaRegistro = LocalDate.now();
     }
+
 
 }

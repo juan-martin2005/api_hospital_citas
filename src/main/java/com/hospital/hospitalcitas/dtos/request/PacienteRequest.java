@@ -23,12 +23,15 @@ public class PacienteRequest {
     private String email;
 
     @NotBlank(message = "el campo password no debe estar vacío")
+    @Size(min = 8, message = "el password debe tener 8 caracteres como mínimo")
     private String password;
 
     @NotBlank(message = "el campo nombre no debe estar vacío")
+    @Pattern(regexp = "[a-zA-ZáéíóúñÁÉÍÓÚÑ ]+", message = "solo se aceptan cadenas de texto")
     private String nombre;
 
     @NotBlank(message = "el campo apellido no debe estar vacío")
+    @Pattern(regexp = "[a-zA-ZáéíóúñÁÉÍÓÚÑ ]+", message = "solo se aceptan cadenas de texto")
     private String apellido;
 
     @NotNull(message = "el campo fecha de nacimiento no debe estar vacío")

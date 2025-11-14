@@ -1,7 +1,7 @@
 package com.hospital.hospitalcitas.controllers;
 
 import com.hospital.hospitalcitas.dtos.request.HorarioDoctorRequest;
-import com.hospital.hospitalcitas.services.IHorarioDoctorService;
+import com.hospital.hospitalcitas.services.interfaces.IHorarioDoctorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

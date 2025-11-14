@@ -2,11 +2,9 @@ package com.hospital.hospitalcitas.controllers;
 
 import com.hospital.hospitalcitas.dtos.request.UsuarioRequest;
 import com.hospital.hospitalcitas.dtos.response.UsuarioResponse;
-import com.hospital.hospitalcitas.jwt.JwtService;
-import com.hospital.hospitalcitas.services.IUsuarioService;
+import com.hospital.hospitalcitas.services.interfaces.IUsuarioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,9 +35,15 @@ public class UsuarioController {
 
     //Rutas DELETE de la API
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> eliminarUsuario(@PathVariable int id){
+    public ResponseEntity<?> inactivarUsuario(@PathVariable int id){
         usuarioService.softDelete(id);
-        return ResponseEntity.ok(new ResponseApi("El usuario se ha eliminado", HttpStatus.OK.value()));
+        return ResponseEntity.ok(new ResponseApi("El usuario se ha inactivado :v", HttpStatus.OK.value()));
+    }
+
+    @PutMapping("/activar/{id}")
+    public ResponseEntity<?> activarUsuario(@PathVariable int id){
+        usuarioService.activarUser(id);
+        return ResponseEntity.ok(new ResponseApi("El usuario se ha activado", HttpStatus.OK.value()));
     }
 
 

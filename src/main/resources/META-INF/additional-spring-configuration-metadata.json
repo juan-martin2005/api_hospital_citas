@@ -4,5 +4,10 @@
       "name": "jwt.secureKey",
       "type": "java.lang.String",
       "description": "Description for jwt.secureKey."
-  }
-] }
+    },
+    {
+      "name": "ACCESS_TOKEN",
+      "type": "java.lang.String",
+      "description": "Description for ACCESS_TOKEN."
+    }
+  ] }

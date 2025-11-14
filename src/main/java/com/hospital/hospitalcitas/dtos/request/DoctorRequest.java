@@ -12,17 +12,20 @@ import lombok.Setter;
 public class DoctorRequest {
     @NotBlank(message = "el campo email no debe estar vacío")
     @Email(message = "el formato del email no es válido")
-    @Pattern(regexp = "^[a-zA-Z0-9-._]+@hospital\\.com$", message = "el formato del email no es válido, debe terminar con '@hospital.com'")
+    @Pattern(regexp = "^[a-zA-ZáéíóúñÁÉÍÓÚÑ0-9-._]+@hospital\\.com$", message = "el formato del email no es válido, debe terminar con '@hospital.com'")
     private String email;
     @NotBlank(message = "el campo username no debe estar vacío")
+    @Size(min = 8, message = "el password debe tener 8 caracteres como mínimo")
     private String password;
     @NotBlank(message = "el campo nombre no debe estar vacío")
+    @Pattern(regexp = "[a-zA-ZáéíóúñÁÉÍÓÚÑ ]+", message = "solo se aceptan cadenas de texto")
     private String nombre;
     @NotBlank(message = "el campo apellido no debe estar vacío")
+    @Pattern(regexp = "[a-zA-ZáéíóúñÁÉÍÓÚÑ ]+", message = "solo se aceptan cadenas de texto")
     private String apellido;
 
     @NotBlank(message = "el campo telefono no debe estar vacío")
-    @Pattern(regexp = "^[0-9]$", message = "el formato del telefono es incorrecto")
+    @Pattern(regexp = "^[0-9]{9}$", message = "el formato del telefono es incorrecto")
     @Size(min = 9, max = 9, message = "el telefono debe tener 9 dígitos")
     private String telefono;
 

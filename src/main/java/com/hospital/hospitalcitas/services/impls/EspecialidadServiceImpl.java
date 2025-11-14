@@ -1,10 +1,11 @@
-package com.hospital.hospitalcitas.services;
+package com.hospital.hospitalcitas.services.impls;
 
 import com.hospital.hospitalcitas.dtos.request.EspecialidadRequest;
 import com.hospital.hospitalcitas.dtos.response.EspecialidadResponse;
 import com.hospital.hospitalcitas.erros.HandlerExistException;
 import com.hospital.hospitalcitas.models.Especialidad;
 import com.hospital.hospitalcitas.repositories.IEspecialidadRepository;
+import com.hospital.hospitalcitas.services.interfaces.IEspecialidadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +14,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class EspecialidadServiceImpl implements IEspecialidadService{
+public class EspecialidadServiceImpl implements IEspecialidadService {
     private final IEspecialidadRepository especialidadRepository;
 
     @Override
@@ -24,6 +25,10 @@ public class EspecialidadServiceImpl implements IEspecialidadService{
         }
         return especialidades;
     }
+    @Override
+    public Optional<EspecialidadResponse> findById(int id) {
+        return especialidadRepository.findById(id).map(EspecialidadResponse::new);
+    }
 
     @Override
     public void save(EspecialidadRequest especialidad) {
@@ -33,6 +38,7 @@ public class EspecialidadServiceImpl implements IEspecialidadService{
         Especialidad especialidadDb = new Especialidad();
         especialidadDb.setNombre(especialidad.getNombre());
         especialidadDb.setDescripcion(especialidad.getDescripcion());
+        especialidadDb.setPrecio(especialidad.getPrecio());
         especialidadRepository.save(especialidadDb);
     }
 
@@ -42,6 +48,7 @@ public class EspecialidadServiceImpl implements IEspecialidadService{
         Especialidad especialidadDb = opEspecialidad.orElseThrow(()-> new HandlerExistException("Especialidad no encontrado"));
         especialidadDb.setNombre(especialidad.getNombre());
         especialidadDb.setDescripcion(especialidad.getDescripcion());
+        especialidadDb.setPrecio(especialidad.getPrecio());
         especialidadRepository.save(especialidadDb);
     }
 

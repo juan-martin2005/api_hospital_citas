@@ -19,6 +19,7 @@ public class HorarioDoctor {
     @Enumerated(EnumType.STRING)
     private Estado estado;
     private LocalDate fecha;
+
     @Column(columnDefinition = "TIME(0)")
     private LocalTime horaInicio;
     @Column(columnDefinition = "TIME(0)")

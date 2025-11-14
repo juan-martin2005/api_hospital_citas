@@ -2,7 +2,7 @@ package com.hospital.hospitalcitas.controllers;
 
 import com.hospital.hospitalcitas.dtos.request.EspecialidadRequest;
 import com.hospital.hospitalcitas.dtos.response.EspecialidadResponse;
-import com.hospital.hospitalcitas.services.IEspecialidadService;
+import com.hospital.hospitalcitas.services.interfaces.IEspecialidadService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/especialidad")
@@ -21,6 +22,11 @@ public class EspecialidadController {
     public ResponseEntity<?> listarEspecialidad() {
         List<EspecialidadResponse> especialidades = especialidadService.findAll();
         return ResponseEntity.ok().body(especialidades);
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<?> listarEspecialidadById(@PathVariable int id) {
+        Optional<EspecialidadResponse> especialidad = especialidadService.findById(id);
+        return ResponseEntity.ok().body(especialidad);
     }
 
     @PostMapping

@@ -6,7 +6,11 @@ import com.hospital.hospitalcitas.models.CitaMedica;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ICitamedicaRepository extends  JpaRepository<CitaMedica, Integer> {
     List<CitaMedica> findByPaciente_Id(Integer id);
+    List<CitaMedica> findByDoctor_id(Integer id);
+    Optional<CitaMedica> findByPaciente_IdAndId(Integer pacienteId, Integer id);
+    Optional<CitaMedica> findByDoctor_IdAndId(Integer doctorId, Integer id);
 }

@@ -1,4 +1,4 @@
-package com.hospital.hospitalcitas.services;
+package com.hospital.hospitalcitas.services.interfaces;
 
 import com.hospital.hospitalcitas.dtos.request.HorarioDoctorRequest;
 import com.hospital.hospitalcitas.dtos.response.HorarioDoctorResponse;
