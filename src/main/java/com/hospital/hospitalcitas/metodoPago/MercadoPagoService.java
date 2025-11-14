@@ -23,7 +23,7 @@ import java.util.*;
 
 @Service
 public class MercadoPagoService {
-    @Value("${ACCESS_TOKEN}")
+    @Value("${MERCADO_PAGO_ACCESS_TOKEN}")
     private String token;
     private final String uniqueValue = UUID.randomUUID().toString();
 
